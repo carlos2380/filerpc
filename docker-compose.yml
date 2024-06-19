@@ -7,9 +7,14 @@ services:
       - "50051:50051"
     depends_on:
       - redis
-    command: ["/go-rpc-server", "-network", "tcp", "-port", "50051"]
+    command: ["/go-rpc-server", "-network", "tcp", "-port", "50051", "-redis-addr", "redis:6379"]
 
   redis:
     image: "redis:alpine"
     ports:
       - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+volumes:
+  redis-data:

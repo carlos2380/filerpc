@@ -8,11 +8,20 @@ import (
 	log "filerpc/internal/logger"
 	pb "filerpc/internal/proto"
 	service "filerpc/internal/service"
+
+	"github.com/go-redis/redis/v8"
 )
 
 type Server struct {
-	pb.UnimplementedFileServiceServer
+    pb.UnimplementedFileServiceServer
+    RedisClient *redis.Client
 }
+
+// NewServer creates a new gRPC server with the provided Redis client
+func NewServer(redisClient *redis.Client) *Server {
+    return &Server{RedisClient: redisClient}
+}
+
 
 func (s *Server) ReadFile(ctx context.Context, req *pb.FileRequest) (*pb.FileResponse, error) {
 	fileType, version, hash := getParamas(req)
@@ -25,11 +34,10 @@ func (s *Server) ReadFile(ctx context.Context, req *pb.FileRequest) (*pb.FileRes
 
 	contentHash := service.CalculateHash(content)
 
-	
 	if hash != contentHash {
 		hash = ""
 	}
-	
+
 	return &pb.FileResponse{
 		Type:    fileType,
 		Version: version,
