@@ -1,10 +1,10 @@
 package fileutils
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
+	"filerpc/internal/errors"
 	log "filerpc/internal/logger"
 )
 
@@ -15,10 +15,10 @@ func ReadFile(fileType, version string) (string, []byte, error) {
 	if err != nil {
 		if os.IsNotExist(err) {
 			log.Logger.Error("File not found:", filePath)
-			return "", nil, fmt.Errorf("file not found: %s", filePath)
+			return "", nil, errors.ErrFileNotFound
 		}
 		log.Logger.Error("Error reading file:", err)
-		return "", nil, fmt.Errorf("error reading file: %w", err)
+		return "", nil, errors.ErrReadFile
 	}
 	log.Logger.Debug("File read successfully")
 	return filePath, data, nil

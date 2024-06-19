@@ -6,6 +6,7 @@ import (
 	"net"
 
 	"filerpc/internal/datastore"
+	"filerpc/internal/errors"
 	"filerpc/internal/handler"
 	log "filerpc/internal/logger"
 	"filerpc/internal/proto"
@@ -17,7 +18,7 @@ func StartGRPCServer(ctx context.Context, network, port, dbAddr string) error {
 
 	redisClient, err := datastore.InitializeRedisClient(ctx, dbAddr)
 	if err != nil {
-		return fmt.Errorf("failed to initialize Redis client: %w", err)
+		return errors.ErrFailedToConnectRedis
 	}
 
 	log.Logger.Info("Connected to Redis")
@@ -28,7 +29,7 @@ func StartGRPCServer(ctx context.Context, network, port, dbAddr string) error {
 	address := fmt.Sprintf(":%s", port)
 	lis, err := net.Listen(network, address)
 	if err != nil {
-		return fmt.Errorf("failed to listen: %w", err)
+		return errors.ErrFailedToListen
 	}
 
 	log.Logger.Infof("Server listening on %s %s...", network, address)
@@ -36,7 +37,7 @@ func StartGRPCServer(ctx context.Context, network, port, dbAddr string) error {
 	proto.RegisterFileServiceServer(grpcServer, srv)
 
 	if err := grpcServer.Serve(lis); err != nil {
-		return fmt.Errorf("failed to serve: %w", err)
+		return errors.ErrFailedToServe
 	}
 
 	log.Logger.Info("Module initialized successfully")

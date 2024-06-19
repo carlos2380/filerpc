@@ -2,7 +2,7 @@ package datastore
 
 import (
 	"context"
-	"fmt"
+	"filerpc/internal/errors"
 
 	"github.com/go-redis/redis/v8"
 )
@@ -33,7 +33,7 @@ func InitializeRedisClient(ctx context.Context, redisAddr string) (*redis.Client
 	})
 
 	if err := client.Ping(ctx).Err(); err != nil {
-		return nil, fmt.Errorf("failed to connect to Redis: %w", err)
+		return nil, errors.ErrFailedToConnectRedis
 	}
 
 	return client, nil

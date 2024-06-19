@@ -30,22 +30,22 @@ func (s *Server) ReadFile(ctx context.Context, req *pb.FileRequest) (*pb.FileRes
 		return nil, errors.ErrFileNotFound
 	}
 
+	response := &pb.FileResponse{
+		Type:    fileType,
+		Version: version,
+	}
+
 	contentHash := service.CalculateHash(content)
+	response.Hash = contentHash
 
 	if hash == contentHash {
 		if err := s.DataStore.Save(ctx, filePath, content, contentHash); err != nil {
 			log.Logger.Error("Error saving to datastore: ", err)
 		}
-	} else {
-		hash = ""
+		response.Content = content
 	}
 
-	return &pb.FileResponse{
-		Type:    fileType,
-		Version: version,
-		Hash:    hash,
-		Content: content,
-	}, nil
+	return response, nil
 }
 
 func getParamas(req *pb.FileRequest) (string, string, string) {
