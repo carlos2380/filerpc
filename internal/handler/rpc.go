@@ -3,30 +3,28 @@ package handler
 import (
 	"context"
 
+	"filerpc/internal/datastore"
 	"filerpc/internal/errors"
 	fileutils "filerpc/internal/file"
 	log "filerpc/internal/logger"
 	pb "filerpc/internal/proto"
 	service "filerpc/internal/service"
-
-	"github.com/go-redis/redis/v8"
 )
 
 type Server struct {
-    pb.UnimplementedFileServiceServer
-    RedisClient *redis.Client
+	pb.UnimplementedFileServiceServer
+	DataStore datastore.FileDataStore
 }
 
-// NewServer creates a new gRPC server with the provided Redis client
-func NewServer(redisClient *redis.Client) *Server {
-    return &Server{RedisClient: redisClient}
+// NewServer creates a new gRPC server with the provided DataStore
+func NewServer(ds datastore.FileDataStore) *Server {
+	return &Server{DataStore: ds}
 }
-
 
 func (s *Server) ReadFile(ctx context.Context, req *pb.FileRequest) (*pb.FileResponse, error) {
 	fileType, version, hash := getParamas(req)
 
-	_, content, err := fileutils.ReadFile(fileType, version)
+	filePath, content, err := fileutils.ReadFile(fileType, version)
 	if err != nil {
 		log.Logger.Error("Error reading file: ", err)
 		return nil, errors.ErrFileNotFound
@@ -34,7 +32,11 @@ func (s *Server) ReadFile(ctx context.Context, req *pb.FileRequest) (*pb.FileRes
 
 	contentHash := service.CalculateHash(content)
 
-	if hash != contentHash {
+	if hash == contentHash {
+		if err := s.DataStore.Save(ctx, filePath, content, contentHash); err != nil {
+			log.Logger.Error("Error saving to datastore: ", err)
+		}
+	} else {
 		hash = ""
 	}
 
@@ -47,7 +49,6 @@ func (s *Server) ReadFile(ctx context.Context, req *pb.FileRequest) (*pb.FileRes
 }
 
 func getParamas(req *pb.FileRequest) (string, string, string) {
-
 	defaultType := "core"
 	defaultVersion := "1.0.0"
 
