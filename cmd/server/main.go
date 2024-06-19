@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"net"
 
 	"filerpc/internal/handler"
@@ -12,16 +13,27 @@ import (
 )
 
 func main() {
+
+	network := flag.String("network", "tcp", "Network type to use (e.g., tcp, tcp4, tcp6, unix)")
+	port := flag.String("port", "50051", "Port or address to listen on")
+	flag.Parse()
+
 	log.Logger.Info("Initializing module...")
-	lis, err := net.Listen("tcp", ":50051")
+	startGRPCServer(*network, *port)
+}
+
+func startGRPCServer(network, port string) {
+	address := net.JoinHostPort("", port)
+	lis, err := net.Listen(network, address)
 	if err != nil {
 		log.Logger.Fatalf("failed to listen: %v", err)
 	}
-	log.Logger.Info("Server listening port 50051...")
+
+	log.Logger.Infof("Server listening on %s %s...", network, address)
 	s := grpc.NewServer()
 	pb.RegisterFileServiceServer(s, &handler.Server{})
 	if err := s.Serve(lis); err != nil {
 		log.Logger.Fatalf("failed to serve: %v", err)
 	}
-	log.Logger.Info("Module initialized successfully")
+
 }

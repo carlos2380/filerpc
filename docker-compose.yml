@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  go-rpc-server:
+    build: .
+    ports:
+      - "50051:50051"
+    depends_on:
+      - redis
+    command: ["/go-rpc-server", "-network", "tcp", "-port", "50051"]
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
