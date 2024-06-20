@@ -7,6 +7,7 @@ import (
 
 	"filerpc/internal/datastore"
 	"filerpc/internal/errors"
+	fileutils "filerpc/internal/file"
 	"filerpc/internal/handler"
 	log "filerpc/internal/logger"
 	"filerpc/internal/proto"
@@ -15,7 +16,6 @@ import (
 )
 
 func StartGRPCServer(ctx context.Context, network, port, dbAddr string) error {
-
 	redisClient, err := datastore.InitializeRedisClient(ctx, dbAddr)
 	if err != nil {
 		return errors.ErrFailedToConnectRedis
@@ -24,7 +24,8 @@ func StartGRPCServer(ctx context.Context, network, port, dbAddr string) error {
 	log.Logger.Info("Connected to Redis")
 
 	dstore := datastore.NewRedisFileDataStore(redisClient)
-	srv := handler.NewServer(dstore)
+	fileReader := fileutils.DefaultFileReader{}
+	srv := handler.NewServer(dstore, fileReader)
 
 	address := fmt.Sprintf(":%s", port)
 	lis, err := net.Listen(network, address)

@@ -13,18 +13,18 @@ import (
 
 type Server struct {
 	pb.UnimplementedFileServiceServer
-	DataStore datastore.FileDataStore
+	DataStore  datastore.FileDataStore
+	FileReader fileutils.FileReader
 }
 
-// NewServer creates a new gRPC server with the provided DataStore
-func NewServer(ds datastore.FileDataStore) *Server {
-	return &Server{DataStore: ds}
+func NewServer(dstore datastore.FileDataStore, freader fileutils.FileReader) *Server {
+	return &Server{DataStore: dstore, FileReader: freader}
 }
 
 func (s *Server) ReadFile(ctx context.Context, req *pb.FileRequest) (*pb.FileResponse, error) {
 	fileType, version, hash := getParamas(req)
 
-	filePath, content, err := fileutils.ReadFile(fileType, version)
+	filePath, content, err := s.FileReader.ReadFile(fileType, version)
 	if err != nil {
 		log.Logger.Error("Error reading file: ", err)
 		return nil, errors.ErrFileNotFound

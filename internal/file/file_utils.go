@@ -8,7 +8,13 @@ import (
 	log "filerpc/internal/logger"
 )
 
-func ReadFile(fileType, version string) (string, []byte, error) {
+type FileReader interface {
+	ReadFile(fileType, version string) (string, []byte, error)
+}
+
+type DefaultFileReader struct{}
+
+func (d DefaultFileReader) ReadFile(fileType, version string) (string, []byte, error) {
 	filePath := filepath.Join(fileType, version+".json")
 	log.Logger.Debug("Reading file from path:", filePath)
 	data, err := os.ReadFile(filePath)
