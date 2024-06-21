@@ -2,10 +2,16 @@ syntax = "proto3";
 
 package file;
 
-option go_package = "filerpc/internal/proto;proto";
+option go_package = "internal/proto;proto";
+
+import "google/api/annotations.proto";
 
 service FileService {
-    rpc ReadFile (FileRequest) returns (FileResponse);
+    rpc ReadFile (FileRequest) returns (FileResponse) {
+        option (google.api.http) = {
+            get: "/v1/file"
+        };
+    }
 }
 
 message FileRequest {

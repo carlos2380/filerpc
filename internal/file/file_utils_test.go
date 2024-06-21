@@ -1,8 +1,12 @@
+//go:build integration
+// +build integration
+
 package fileutils_test
 
 import (
 	"filerpc/internal/errors"
 	fileutils "filerpc/internal/file"
+	"log"
 	"os"
 	"path/filepath"
 	"testing"
@@ -47,7 +51,11 @@ func TestDefaultFileReader_ReadFile(t *testing.T) {
 
 		err := os.Chmod(testFilePath, 0000)
 		assert.NoError(t, err)
-		defer os.Chmod(testFilePath, 0644)
+		defer func() {
+			if err := os.Chmod(testFilePath, 0644); err != nil {
+				log.Printf("failed to chmod file: %v", err)
+			}
+		}()
 
 		filePath, data, err := reader.ReadFile("testdir", "unreadablefile")
 		assert.ErrorIs(t, err, errors.ErrReadFile)
