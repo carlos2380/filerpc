@@ -19,7 +19,7 @@ COPY --from=builder /app/core /core
 EXPOSE 50051
 EXPOSE 8080
 
-CMD ["/go-rpc-server", "-network", "tcp", "-grpc-port", "50051", "-host", "127.0.0.1", "-gateway-port", "8080"]
+CMD ["/go-rpc-server", "-network", "tcp", "-grpc-port", "50051", "-host", "0.0.0.0", "-gateway-port", "8080"]
 
 FROM scratch AS client
 COPY --from=builder /client /client

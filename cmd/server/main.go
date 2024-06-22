@@ -17,7 +17,7 @@ func main() {
 	network := flag.String("network", "tcp", "Network type to use (e.g., tcp, tcp4, tcp6, unix)")
 	grpcPort := flag.String("grpc-port", "50051", "Port or address to listen on for gRPC")
 	dbAddr := flag.String("redis-addr", "redis:6379", "Address of the Redis server")
-	host := flag.String("host", "127.0.0.1", "Host address for the server")
+	host := flag.String("host", "0.0.0.0", "Host address for the server")
 	gatewayPort := flag.String("gateway-port", "8080", "Port to run the gRPC-Gateway on")
 	flag.Parse()
 

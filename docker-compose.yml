@@ -10,7 +10,7 @@ services:
       - "8080:8080"
     depends_on:
       - redis
-    command: ["/go-rpc-server", "-network", "tcp", "-grpc-port", "50051", "-host", "127.0.0.1", "-gateway-port", "8080"]
+    command: ["/go-rpc-server", "-network", "tcp", "-grpc-port", "50051", "-host", "0.0.0.0", "-gateway-port", "8080"]
     volumes:
       - ./internal/proto/file_service.swagger.json:/app/file_service.swagger.json
 
