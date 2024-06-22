@@ -40,7 +40,7 @@ func main() {
 			log.Logger.Fatalf("failed to start gRPC-Gateway: %v", err)
 		}
 	}()
-		
+
 	<-sig
 	log.Logger.Info("Shutting down server...")
 	cancel()
