@@ -7,3 +7,14 @@ linters:
     - govet
     - ineffassign
     - staticcheck
+    - unused
+    - gocyclo
+    - gofmt
+    - misspell
+    - nakedret
+    - unconvert
+    - unparam
+    - whitespace
+    - goimports
+    - exportloopref
+

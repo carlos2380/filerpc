@@ -2,7 +2,8 @@
   "swagger": "2.0",
   "info": {
     "title": "FileService",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "description": "A service to read files and return their content along with metadata. If the provided hash is different, the service will return the file's hash and an empty content field. If the hash is correct and the file exists, the content of the file and its hash will be saved in Redis."
   },
   "host": "localhost:8080",
   "schemes": [
@@ -12,24 +13,32 @@
     "/v1/file": {
       "get": {
         "operationId": "FileService_ReadFile",
+        "summary": "Read a file and return its hash and content. If the provided hash differs from the file's hash, the response will include the file's hash and a null content. The content of the file and its hash will be saved in Redis",
+        "description": "This endpoint reads a file based on the provided type, version, and hash. All parameters are optional with default values.",
         "parameters": [
           {
             "name": "type",
             "in": "query",
-            "required": true,
-            "type": "string"
+            "required": false,
+            "type": "string",
+            "description": "The type of the file. Default is 'core'.",
+            "default": "core"
           },
           {
             "name": "version",
             "in": "query",
-            "required": true,
-            "type": "string"
+            "required": false,
+            "type": "string",
+            "description": "The version of the file. Default is '1.0.0'.",
+            "default": "1.0.0"
           },
           {
             "name": "hash",
             "in": "query",
-            "required": true,
-            "type": "string"
+            "required": false,
+            "type": "string",
+            "description": "The hash of the file content. Default is null.",
+            "default": null
           }
         ],
         "responses": {
@@ -37,6 +46,24 @@
             "description": "A successful response",
             "schema": {
               "$ref": "#/definitions/FileResponse"
+            }
+          },
+          "404": {
+            "description": "File not found",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error while reading the file",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "503": {
+            "description": "Failed to connect to Redis",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
             }
           },
           "default": {
@@ -54,16 +81,20 @@
       "type": "object",
       "properties": {
         "type": {
-          "type": "string"
+          "type": "string",
+          "description": "The type of the file."
         },
         "version": {
-          "type": "string"
+          "type": "string",
+          "description": "The version of the file."
         },
         "hash": {
-          "type": "string"
+          "type": "string",
+          "description": "The hash of the file content."
         },
         "content": {
-          "type": "string"
+          "type": "string",
+          "description": "The content of the file."
         }
       }
     },
@@ -72,10 +103,12 @@
       "properties": {
         "code": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "The error code."
         },
         "message": {
-          "type": "string"
+          "type": "string",
+          "description": "The error message."
         },
         "details": {
           "type": "array",
@@ -83,19 +116,24 @@
             "type": "object",
             "properties": {
               "type": {
-                "type": "string"
+                "type": "string",
+                "description": "The type of the error detail."
               },
               "additionalProp1": {
-                "type": "string"
+                "type": "string",
+                "description": "Additional property 1."
               },
               "additionalProp2": {
-                "type": "string"
+                "type": "string",
+                "description": "Additional property 2."
               },
               "additionalProp3": {
-                "type": "string"
+                "type": "string",
+                "description": "Additional property 3."
               }
             }
-          }
+          },
+          "description": "Details about the error."
         }
       }
     }

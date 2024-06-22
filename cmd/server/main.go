@@ -36,11 +36,11 @@ func main() {
 	}()
 
 	go func() {
-		if err := gateway.RunGateway(ctx, *host, *grpcPort,*gatewayPort); err != nil {
+		if err := gateway.RunGateway(ctx, *host, *grpcPort, *gatewayPort); err != nil {
 			log.Logger.Fatalf("failed to start gRPC-Gateway: %v", err)
 		}
 	}()
-
+		
 	<-sig
 	log.Logger.Info("Shutting down server...")
 	cancel()

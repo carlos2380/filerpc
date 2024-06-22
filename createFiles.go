@@ -17,7 +17,9 @@ func main() {
 		return
 	}
 
+	//Number of threads
 	for i := 0; i <= 8; i++ {
+		//Number of files per thread
 		for j := 0; j <= 1000; j++ {
 			fileName := fmt.Sprintf("1.%d.%d.json", i, j)
 			filePath := filepath.Join(basePath, fileName)

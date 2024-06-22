@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   go-rpc-server:
-    build: .
+    build:
+      context: .
+      target: server
     ports:
       - "50051:50051"
       - "8080:8080"

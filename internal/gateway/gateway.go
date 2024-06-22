@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
@@ -93,7 +94,6 @@ func enableCORS(next http.Handler) http.Handler {
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
-		// Handle preflight requests
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
 			return
@@ -118,5 +118,14 @@ func RunGateway(ctx context.Context, host string, grpcPort string, gatewayPort s
 	})
 
 	log.Logger.Infof("Serving gRPC-Gateway on http://%s:%s", host, gatewayPort)
-	return http.ListenAndServe(":"+gatewayPort, enableCORS(httpMux))
+
+	server := &http.Server{
+		Addr:         ":" + gatewayPort,
+		Handler:      enableCORS(httpMux),
+		ReadTimeout:  20 * time.Second,
+		WriteTimeout: 20 * time.Second,
+		IdleTimeout:  30 * time.Second,
+	}
+
+	return server.ListenAndServe()
 }

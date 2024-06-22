@@ -14,5 +14,4 @@ func init() {
 	Logger.SetOutput(os.Stdout)
 	Logger.SetLevel(logrus.InfoLevel)
 	Logger.SetFormatter(&logrus.JSONFormatter{})
-
 }
