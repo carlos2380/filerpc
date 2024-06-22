@@ -85,7 +85,7 @@ Executing concurrency 1 and 15000 transaction we have a TPS of 1482
 ![AB 1C](https://github.com/carlos2380/webCarlos2380/blob/master/filerpc/AB1.png)
 Executing concurrency 4 and 15000 transactions we have a TPS of 3559
 
-![AB 4C](https://github.com/carlos2380/webCarlos2380/blob/master/filerpc/AB1.png)
+![AB 4C](https://github.com/carlos2380/webCarlos2380/blob/master/filerpc/AB4.png)
 
 ### Conclusion
 
