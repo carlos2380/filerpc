@@ -30,7 +30,7 @@ The documentation for the proto calls is available in an HTML format. To access 
 http://localhost:8080/doc/
 ```
 The documentation provides detailed information about the gRPC calls, including the parameters they accept and the responses they return
-
+![doc](https://github.com/carlos2380/webCarlos2380/blob/master/filerpc/DOC.png)
 
 #### grpcurl
 Grpcurl is a command-line tool that lets you interact with gRPC servers.
