@@ -7,12 +7,9 @@ services:
       target: server
     ports:
       - "50051:50051"
-      - "8080:8080"
     depends_on:
       - redis
-    command: ["/go-rpc-server", "-network", "tcp", "-grpc-port", "50051", "-host", "0.0.0.0", "-gateway-port", "8080"]
-    volumes:
-      - ./internal/proto/file_service.swagger.json:/app/file_service.swagger.json
+    command: ["/go-rpc-server", "-network", "tcp", "-grpc-port", "50051"]
 
   redis:
     image: "redis:alpine"
@@ -21,16 +18,15 @@ services:
     volumes:
       - redis-data:/data
 
-  swagger-ui:
-    image: swaggerapi/swagger-ui
+  docserver:
+    build:
+      context: .
+      target: docserver
     ports:
-      - "8081:8080"
-    environment:
-      SWAGGER_JSON: /app/file_service.swagger.json
+      - "8080:8080"
+    command: ["/doc-server", "-port-doc", "8080"]
     volumes:
-      - ./internal/proto/file_service.swagger.json:/app/file_service.swagger.json
-    depends_on:
-      - go-rpc-server
+      - ./doc:/doc  
 
 volumes:
   redis-data:

@@ -6,7 +6,7 @@ The Filerpc is designed to read files from the disk, calculate their hashes, and
 
 ## Service Description
 
-The Filerpc reads files and returns their content along with metadata. If the provided hash differs from the calculated hash, the service returns the correct hash with an empty content field. If the hash is correct and the file exists, the service saves the file's content and its hash in Redis.
+Using gRPC, Filerpc reads files and returns their content along with metadata. If the provided hash differs from the calculated hash, the service returns the correct hash with an empty content field. If the hash is correct and the file exists, the service saves the file's content and its hash in Redis.
 
 
 ## 1- How to run
@@ -24,20 +24,13 @@ docker-compose up --build
 This command builds the Dockerfile and pull a redis and swagger from DockerHub.
 Once docker-compose has finished building and running the images and logs. 
 
-#### Swagger
-Swagger allows you to visualize and interact with grpc via http using grpc-gateway.
+#### Documentation gRPC
+The documentation for the proto calls is available in an HTML format. To access this documentation:
 ```
-http://localhost:8081
+http://localhost:8080/doc/
 ```
-Initialize the browser on this URL and access the documentation to know the request and response.
+The documentation provides detailed information about the gRPC calls, including the parameters they accept and the responses they return
 
-![swagger1](https://github.com/carlos2380/webCarlos2380/blob/master/filerpc/Swagger.png)
-
-You can interact with swagger and make requests and see the responses.
-
-![swagger2](https://github.com/carlos2380/webCarlos2380/blob/master/filerpc/Swagger2.png)
-
-- The documentation that uses swagger to work is here:
 ## 2- Performance
 I tested the performance using the client and server on the same host. The results are different than in a real environment where the client and server do not share resources.
 
@@ -75,17 +68,6 @@ Executing concurrency 1 and 20000 transactions per thread we have a TPS (Transac
 
 Executing concurrency 4 and 5000 transactions per thread we have a TPS of 7253.
 ![TPS 4C](https://github.com/carlos2380/webCarlos2380/blob/master/filerpc/TPS7255.png)
-
-### AB Apache
-Using AB testing it is easy to check the transactions per second specifying the number of threads and the number of total transactions 
-
-#### Results
-Executing concurrency 1 and 15000 transaction we have a TPS of 1482
-
-![AB 1C](https://github.com/carlos2380/webCarlos2380/blob/master/filerpc/AB1.png)
-Executing concurrency 4 and 15000 transactions we have a TPS of 3559
-
-![AB 4C](https://github.com/carlos2380/webCarlos2380/blob/master/filerpc/AB4.png)
 
 ### Conclusion
 
@@ -197,61 +179,30 @@ Generate Mocks:
 mockgen -source=path/to/your/interface.go -destination=path/to/your/mock/file.go -package=yourpackage
 ```
 
-## Swagger Documentation with gRPC-Gateway
+## Documentation with gRPC-Gateway
 
-To create Swagger documentation for our gRPC services and enable testing of the files endpoint directly from Swagger, we used gRPC-Gateway to translate the gRPC API into a RESTful HTTP API.
+To create  documentation for our gRPC services I use protoc-gen-doc.
+- https://github.com/sourcegraph/prototools/blob/master/README.doc.md
 
 #### Steps to Implement
 
-##### 1 Install gRPC-Gateway and OpenAPI Plugin:
+##### 1 Install protoc-gen-doc
 ```
-go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@latest
-go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
+go get -u sourcegraph.com/sourcegraph/prototools/cmd/protoc-gen-doc
 ```
-##### 2 Clone Google APIs:
+##### 2 Add more info as comments
 ```
-git clone https://github.com/googleapis/googleapis.git
-```
-##### 3 Define HTTP Rules in Protobuf:
-Annotate service definitions with HTTP rules.
-```
-import "google/api/annotations.proto";
-
-service FileService {
-    rpc ReadFile (FileRequest) returns (FileResponse) {
-        option (google.api.http) = {
-            get: "/v1/file"
-        };
-    }
+// FileRequest request to read a file from the server and save it on the Redis, return content and hash.
+message FileRequest {
+    // The type of the file to read. Defaults to "core".
+    string type = 1;
+    ...
 }
 ```
-##### 4 Generate Code:
+##### 3 Generate the documentation:
+Note: make sure the folder exists.
 ```
-protoc -I . -I ./googleapis --go_out=. --go-grpc_out=. --grpc-gateway_out=. --openapiv2_out . internal/proto/file_service.proto
-```
-##### 5 Set Up and Serve Swagger:
-Implement the gRPC-Gateway server to handle HTTP requests and serve the generated Swagger JSON file.
-- https://github.com/carlos2380/filerpc/blob/main/internal/gateway/gateway.go
-
-#### Cors (Cross-Origin Resource Sharing)
-
-CORS is enabled to allow connections from different origins, especially useful for connecting Swagger UI with the API.
-
-```go
-func enableCORS(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-
-		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-		next.ServeHTTP(w, r)
-	})
-}
+protoc --doc_out="doc/" --doc_opt=html,index.html internal/proto/file_service.proto
 ```
 
 ## Linter

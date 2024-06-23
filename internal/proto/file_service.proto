@@ -4,25 +4,25 @@ package file;
 
 option go_package = "internal/proto;proto";
 
-import "google/api/annotations.proto";
 
-service FileService {
-    rpc ReadFile (FileRequest) returns (FileResponse) {
-        option (google.api.http) = {
-            get: "/v1/file"
-        };
-    }
-}
-
+// FileRequest request to read a file from the server and save it on the Redis, return content and hash.
 message FileRequest {
+    // The type of the file to read. Defaults to "core".
     string type = 1;
+    // The version of the file to read. Defaults to "1.0.0".
     string version = 2;
+    // The hash of the file to read. If provided, it will be compared against the calculated hash.
     string hash = 3;
 }
 
+// FileResponse represents the response from reading a file.
 message FileResponse {
+    // The type of the file.
     string type = 1;
+    // The version of the file.
     string version = 2;
+    // The hash of the file content. If the provided hash does not match, return the correct hash.
     string hash = 3;
+    // The content of the file. Will be empty if the provided hash does not match the calculated hash.
     bytes content = 4;
 }
