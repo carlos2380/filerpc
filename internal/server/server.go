@@ -13,6 +13,7 @@ import (
 	"filerpc/internal/proto"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 func StartGRPCServer(ctx context.Context, network, port, dbAddr string) error {
@@ -37,10 +38,11 @@ func StartGRPCServer(ctx context.Context, network, port, dbAddr string) error {
 	grpcServer := grpc.NewServer()
 	proto.RegisterFileServiceServer(grpcServer, srv)
 
+	reflection.Register(grpcServer)
+	log.Logger.Info("Module initialized successfully")
 	if err := grpcServer.Serve(lis); err != nil {
 		return errors.ErrFailedToServe
 	}
 
-	log.Logger.Info("Module initialized successfully")
 	return nil
 }

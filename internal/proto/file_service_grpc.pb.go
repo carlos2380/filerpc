@@ -25,6 +25,8 @@ const (
 // FileServiceClient is the client API for FileService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// FileService is the service definition.
 type FileServiceClient interface {
 	ReadFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*FileResponse, error)
 }
@@ -50,6 +52,8 @@ func (c *fileServiceClient) ReadFile(ctx context.Context, in *FileRequest, opts 
 // FileServiceServer is the server API for FileService service.
 // All implementations must embed UnimplementedFileServiceServer
 // for forward compatibility
+//
+// FileService is the service definition.
 type FileServiceServer interface {
 	ReadFile(context.Context, *FileRequest) (*FileResponse, error)
 	mustEmbedUnimplementedFileServiceServer()

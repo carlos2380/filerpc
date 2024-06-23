@@ -31,6 +31,18 @@ http://localhost:8080/doc/
 ```
 The documentation provides detailed information about the gRPC calls, including the parameters they accept and the responses they return
 
+
+#### grpcurl
+Grpcurl is a command-line tool that lets you interact with gRPC servers.
+- https://github.com/fullstorydev/grpcurl
+
+To interact with the server after run `docker-compose up --build`run the following command:
+
+```
+docker run --rm fullstorydev/grpcurl -d '{"type":"core","version":"1.0.0","hash":"68db232fd1980a3cbdc9cc714abe9a743ef1bcd24b9d351336951f0f15ed0b63"}' -plaintext host.docker.internal:50051 file.FileService/ReadFile | jq -r 'if .content != null then (.content | @base64d) as $decoded | .content = $decoded else . end'
+```
+`grpcurl` is used to invoke the gRPC method, and jq decodes the content field from Base64. The content is in Base64 because gRPC and JSON handle binary data this way for compatibility and secure transfer. Decoding makes the data easy for the user to read.
+
 ## 2- Performance
 I tested the performance using the client and server on the same host. The results are different than in a real environment where the client and server do not share resources.
 

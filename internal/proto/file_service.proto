@@ -26,3 +26,8 @@ message FileResponse {
     // The content of the file. Will be empty if the provided hash does not match the calculated hash.
     bytes content = 4;
 }
+
+// FileService is the service definition.
+service FileService {
+    rpc ReadFile (FileRequest) returns (FileResponse);
+}
