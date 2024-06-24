@@ -80,7 +80,7 @@ func TestReadFileRPCWithRedis(t *testing.T) {
 				Type:    "core",
 				Version: "1.0.0",
 				Hash:    expectedHash,
-				Content: []byte(fileContent),
+				Content: fileContent,
 			},
 			expectedError: nil,
 		},
@@ -95,7 +95,7 @@ func TestReadFileRPCWithRedis(t *testing.T) {
 				Type:    "core",
 				Version: "1.0.0",
 				Hash:    expectedHash,
-				Content: nil,
+				Content: "",
 			},
 			expectedError: nil,
 		},
@@ -132,8 +132,8 @@ func TestReadFileRPCWithRedis(t *testing.T) {
 				// Comprobar el contenido en la base de datos
 				result, err := redisClient.HGetAll(context.Background(), "core/1.0.0.json").Result()
 				assert.NoError(t, err)
-				if response.Content != nil {
-					assert.Equal(t, string(response.Content), result["content"])
+				if response.Content != "" {
+					assert.Equal(t, response.Content, result["content"])
 					assert.Equal(t, response.Hash, result["hash"])
 				}
 			}

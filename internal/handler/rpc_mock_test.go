@@ -23,11 +23,11 @@ func TestReadFileRPCWithMocks(t *testing.T) {
 	mockFileReader := fileutils.NewMockFileReader(ctrl)
 	server := handler.NewServer(mockDataStore, mockFileReader)
 
-	fileContent := []byte(`{"reward": "100000"}`)
+	fileContent := `{"reward": "100000"}`
 	fileType := "core"
 	version := "1.0.0"
 	filePath := "core/1.0.0.json"
-	expectedHash := service.CalculateHash(fileContent)
+	expectedHash := service.CalculateHash([]byte(fileContent))
 
 	tableTests := []struct {
 		desc             string
@@ -46,10 +46,10 @@ func TestReadFileRPCWithMocks(t *testing.T) {
 			mockSetup: func() {
 				mockFileReader.EXPECT().
 					ReadFile(fileType, version).
-					Return(filePath, fileContent, nil)
+					Return(filePath, []byte(fileContent), nil)
 
 				mockDataStore.EXPECT().
-					Save(gomock.Any(), filePath, fileContent, expectedHash).
+					Save(gomock.Any(), filePath, []byte(fileContent), expectedHash).
 					Return(nil)
 			},
 			expectedResponse: &pb.FileResponse{
@@ -70,13 +70,13 @@ func TestReadFileRPCWithMocks(t *testing.T) {
 			mockSetup: func() {
 				mockFileReader.EXPECT().
 					ReadFile(fileType, version).
-					Return(filePath, fileContent, nil)
+					Return(filePath, []byte(fileContent), nil)
 			},
 			expectedResponse: &pb.FileResponse{
 				Type:    fileType,
 				Version: version,
 				Hash:    expectedHash,
-				Content: nil,
+				Content: "",
 			},
 			expectedError: nil,
 		},

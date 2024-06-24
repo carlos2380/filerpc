@@ -42,7 +42,7 @@ func (s *Server) ReadFile(ctx context.Context, req *pb.FileRequest) (*pb.FileRes
 		if err := s.DataStore.Save(ctx, filePath, content, contentHash); err != nil {
 			log.Logger.Error("Error saving to datastore: ", err)
 		}
-		response.Content = content
+		response.Content = string(content)
 	}
 
 	return response, nil
